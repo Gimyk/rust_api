@@ -1,3 +1,4 @@
+mod code;
 #[macro_use]
 extern crate nickel;
 extern crate rustc_serialize;
