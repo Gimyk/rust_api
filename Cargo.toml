@@ -1,0 +1,15 @@
+[package]
+name = "rustyAPI"
+version = "0.1.0"
+authors = ["BE2015-1303"]
+edition = "2018"
+
+[dependencies]
+nickel = "*"
+mongodb = "*"
+bson = "*"
+rustc-serialize = "*"
+serde = { version = "1.0", features = ["derive"] }
+serde_derive = "0.9"
+serde_xml = "0.9"
+serde_json = "1.0"
