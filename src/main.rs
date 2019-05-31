@@ -27,7 +27,7 @@ use bson::{Bson, Document};
 use bson::oid::ObjectId;
 
 // for rustc_serialize
-use rustc_serialize::json::{Json, ToJson};
+// use rustc_serialize::json::{Json, ToJson};
 
 // #[derive(Deserialize)]
 #[derive(Serialize, Deserialize, Debug)]
@@ -39,18 +39,22 @@ pub struct User{
     password: String
 }
 
-fn get_data_string(result: MongoResult<Document>) -> Result<Bson, String> {
-    match result {
-        Ok(doc) => Ok(Bson::Document(doc)),
-        Err(e) => Err(format!("{}", e))
-    }
-}
+
+
 
 fn main() {
     let mut server = Nickel::new();
     let mut router = Nickel::router();
+    
+    fn get_data_string(result: MongoResult<Document>) -> Result<Bson, String> {
+        match result {
+            Ok(doc) => Ok(Bson::Document(doc)),
+            Err(e) => Err(format!("{}", e))
+        }
+    }
 
     router.get("/users", middleware! {|_request, mut _res|
+        println!("Gettingt he data");
         // Connect to the database
         let client = Client::connect("localhost", 27017)
         .ok().expect("Error establishing connection.");
@@ -59,7 +63,7 @@ fn main() {
         let coll = client.db("rust-users").collection("users");
 
         // Create cursor that finds all documents
-        let mut cursor = coll.find(None, None).unwrap();
+        let cursor = coll.find(None, None).unwrap();
 
         // Opening for the JSON string to be returned
         let mut data_result = "{\"data\":[".to_owned();
@@ -88,11 +92,13 @@ fn main() {
 
         // Send back the result
         format!("{}", data_result)
+    
+    
     });
 
 
     router.post("/users/new", middleware! {|_req, _res|
-        
+        println!("Posting the data");
         // imported serde and serde_json to fix serde error on json_as
         let user = _req.json_as::<User>().unwrap();
         let firstname = user.firstname.to_string();
@@ -112,15 +118,64 @@ fn main() {
             "email" => email,
             "password" => password
         },None){
-            Ok(_) => (StatusCode::Ok, "Item Save to the databas"),
+            Ok(_) => (StatusCode::Ok, "Item Save to the database"),
             Err(e) => return _res.send(format!("Something happened => {}", e))
         }
 
     });
 
+    router.put("/users/update/:id", middleware! {|_req, _res|
+         println!("Updating the data");
+        // imported serde and serde_json to fix serde error on json_as
+        let user = _req.json_as::<User>().unwrap();
+        let firstname = user.firstname.to_string();
+        let lastname = user.lastname.to_string();
+        let email = user.email.to_string();
+        let password = user.password.to_string();
+        // connect to the database
+        let client = Client::connect("localhost", 27017)
+            .ok().expect("Error while trying to connect");
 
-    router.delete("/users/:id", middleware! {|request, response|
-        format!("Hello from DELETE/users/:id")
+        // the user connection
+        let coll = client.db("rust-users").collection("users");
+                
+        let obj_id = _req.param("id").unwrap();
+
+        let id = match ObjectId::with_string(obj_id) {
+            Ok(oid) => oid,
+            Err(e) => return _res.send(format!("{}", e))
+        };
+        
+        //Delete One
+        // match coll.insert_one(doc! {
+        //     "_id" => id,
+        //     "firstname" => firstname,
+        //     "lastname" => lastname,
+        //     "email" => email,
+        //     "password" => password
+        // },None){
+        //     Ok(_) => (StatusCode::Ok, "Item Updated"),
+        //     Err(e) => return _res.send(format!("Something happened => {}", e))
+        // }
+    });
+
+    router.delete("/users/:id", middleware! {|_req, _res|
+        let client = Client::connect("localhost", 27017).ok().expect("Failed to connect");
+
+        let coll = client.db("rust-users").collection("users");
+
+        let obj_id = _req.param("id").unwrap();
+
+        let id = match ObjectId::with_string(obj_id) {
+            Ok(oid) => oid,
+            Err(e) => return _res.send(format!("{}", e))
+        };
+
+        match coll.delete_one(doc! {"_id" => id}, None){
+            Ok(_) => (StatusCode::Ok, "Item deleted"),
+            Err(e) => return _res.send(format!("Something happened while trying to delete => {}", e))
+
+        }
     });
 
     server.utilize(router);
