@@ -147,16 +147,15 @@ fn main() {
         };
         
         //Delete One
-        // match coll.insert_one(doc! {
-        //     "_id" => id,
-        //     "firstname" => firstname,
-        //     "lastname" => lastname,
-        //     "email" => email,
-        //     "password" => password
-        // },None){
-        //     Ok(_) => (StatusCode::Ok, "Item Updated"),
-        //     Err(e) => return _res.send(format!("Something happened => {}", e))
-        // }
+        match coll.update_one(doc! { "_id" => id,}, doc!{"$set":{
+            "firstname" => firstname,
+            "lastname" => lastname,
+            "email" => email,
+            "password" => password
+        }},None){
+            Ok(_) => (StatusCode::Ok, "Item Updated"),
+            Err(e) => return _res.send(format!("Something happened => {}", e))
+        }
     });
 
     router.delete("/users/:id", middleware! {|_req, _res|
@@ -181,5 +180,3 @@ fn main() {
     server.utilize(router);
     server.listen("127.0.0.1:9000");
 }
-
-
