@@ -59,7 +59,7 @@ struct LoginStuff{
     password: String
 }
 
-static AUTH_SECRET: &'static str = "this should be my key";
+static AUTH_SECRET: &'static str = "this  be my key";
 
 fn main() {
     let mut server = Nickel::new();
