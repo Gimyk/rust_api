@@ -24,7 +24,7 @@ use mongodb::{Client, ThreadedClient};
 use mongodb::db::ThreadedDatabase;
 use mongodb::error::Result as MongoResult;
 
-// for bson 
+// for bson
 use bson::{Bson, Document};
 use bson::oid::ObjectId;
 
