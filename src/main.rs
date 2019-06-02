@@ -1,4 +1,3 @@
-
 #[macro_use]
 extern crate nickel;
 extern crate rustc_serialize;
@@ -9,9 +8,13 @@ extern crate serde_json;
 extern crate bson;
 extern crate mongodb;
 
+extern crate jwt;
+extern crate hyper;
+extern crate crypto;
+
 // for Nickel
 use nickel::{Nickel, HttpRouter, JsonBody, MediaType, Router};
-use nickel::status::StatusCode::{self};
+use nickel::status::StatusCode::{self, Forbidden};
 
 // for json parsin
 use serde::{Deserialize, Serialize};
@@ -21,7 +24,7 @@ use mongodb::{Client, ThreadedClient};
 use mongodb::db::ThreadedDatabase;
 use mongodb::error::Result as MongoResult;
 
-// for bson 
+// for bson
 use bson::{Bson, Document};
 use bson::oid::ObjectId;
 
