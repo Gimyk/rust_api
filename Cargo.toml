@@ -5,7 +5,6 @@ authors = ["Giv Kaf"]
 edition = "2018"
 
 [dependencies]
-rand = "0.6.4"
 nickel = "*"
 mongodb = "0.3.12"
 bson = "0.13.0"

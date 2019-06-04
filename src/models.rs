@@ -1,5 +1,9 @@
 use serde::{Deserialize, Serialize};
 
+use mongodb::error::Result as MongoResult;
+use bson::{Bson, Document};
+
+
 #[derive(Serialize, Deserialize)]
 pub struct User{
     pub firstname: String,
@@ -19,4 +23,11 @@ pub struct Atlass{
 pub struct LoginStuff{
     pub email: String,
     pub password: String
+}
+
+pub fn get_data_string(result: MongoResult<Document>) -> Result<Bson, String> {
+    match result {
+        Ok(doc) => Ok(Bson::Document(doc)),
+        Err(e) => Err(format!("{}", e))
+    }
 }
